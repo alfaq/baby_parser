@@ -1,6 +1,6 @@
 <?php
 
-$file_name = 'PH_content_export_elearn_article_2021-06-15.csv';
+$file_name = 'PH_content_export_article_2021-06-14.csv';
 $path_to_file = 'content/' . $file_name;
 $field_body_name = 'body_value';
 
@@ -67,7 +67,7 @@ if (($handle = fopen($path_to_file, 'r')) !== FALSE) {
       if ($key == 0) {//don't change header
         continue;
       }
-      if (empty($c[$field_image_alt_key]) && !empty($c[$field_image_key])) {
+      if (empty($c[$field_image_alt_key]) && !empty($c[$field_body_key])) {
         $c[$field_image_alt_key] = $c[$field_title_key];
       }
     }
