@@ -27,6 +27,9 @@ if (!empty($files)) {
     $field_image_alt_key = NULL;
     $space_field_keys = [];
 
+    $original_language_suffix = 'en';
+    //$second_language_suffix = 'en'; //TODO
+
     //Read csv in array
     $csv = [];
     if (($handle = fopen($path_to_file, 'r')) !== FALSE) {
@@ -47,6 +50,21 @@ if (!empty($files)) {
             }
           }
         }
+
+        print '<h2 style="color: green">Change headers</h2>';
+        print '<table border="1"><tr><th>Old header</th><th>New header</th></tr>';
+        //change suffix for headers
+        foreach ($csv[0] as $key => $header) {
+          $pos = strpos($header, '_'.$original_language_suffix);
+          if ($pos !== false) {
+            $new_header = str_replace('_'.$original_language_suffix, '', $header);
+
+            $csv[0][$key] = $new_header;
+            print '<tr><td>' . $header . '</td><td>' . $new_header . '</td></tr>';
+          }
+        }
+        print '</table>';
+
       }
       else {
         print '<h2 style="color: red">Empty headers</h2>';
