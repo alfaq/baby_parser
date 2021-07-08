@@ -22,6 +22,9 @@ if (!empty($files)) {
 
     $space_fields = ['field_article_subtitle', 'field_brand_subtitle_value'];
 
+    $image_field = 'field_image';
+    $product_images_field = 'field_images';
+
     $field_title_key = NULL;
     $field_body_key = NULL;
     $field_image_alt_key = NULL;
@@ -29,6 +32,8 @@ if (!empty($files)) {
 
     $original_language_suffix = 'en';
     //$second_language_suffix = 'en'; //TODO
+
+    $product_images_field_key = NULL;
 
     //Read csv in array
     $csv = [];
@@ -42,6 +47,8 @@ if (!empty($files)) {
         $field_title_key = array_search($title_field, $csv[0]);
         $field_body_key = array_search($field_body_name, $csv[0]);
         $field_image_alt_key = array_search($field_image_alt_name, $csv[0]);
+        $product_images_field_key =  array_search($product_images_field, $csv[0]);
+        $image_field_key =  array_search($image_field, $csv[0]);
 
         if (!empty($space_fields)) {
           foreach ($space_fields as $space_field) {
@@ -127,6 +134,38 @@ if (!empty($files)) {
               $c[$space_field_key] = ' ';
             }
           }
+        }
+      }
+
+      if (!empty($product_images_field_key) && !empty($image_field_key)) {
+        $rows = [];
+        foreach ($csv as $key => &$c) {
+          if ($key == 0) {//don't change header
+            continue;
+          }
+          if (!empty($c[$product_images_field_key])) {
+             $images = $c[$product_images_field_key];
+             $rows = array_merge($rows, explode('|',$images));
+          }
+        }
+
+
+        if (!empty($rows)) {
+          $new_csv_rows = [];
+          foreach ($rows as $key => $row) {
+            $empty_key = 0;
+            while ($empty_key < $image_field_key) {
+              $new_csv_rows[$key][$empty_key] = '';
+              $empty_key++;
+            }
+            $new_csv_rows[$key][$image_field_key] = $row;
+            $pieces = explode('/',$row);
+            if (!empty($pieces)) {
+              $new_csv_rows[$key][$field_image_alt_key] = array_pop($pieces);
+            }
+          }
+
+          $csv = array_merge($csv, $new_csv_rows);
         }
       }
 
