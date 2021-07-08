@@ -9,9 +9,12 @@ $field_image_alt_name = 'field_image_alt';
 
 $new_path = '/sites/default/files/migration_images/';
 
+$space_fields = ['field_article_subtitle', 'field_brand_subtitle_value'];
+
 $field_title_key = NULL;
 $field_body_key = NULL;
 $field_image_alt_key = NULL;
+$space_field_keys = [];
 
 //Read csv in array
 $csv = [];
@@ -21,11 +24,18 @@ if (($handle = fopen($path_to_file, 'r')) !== FALSE) {
   }
 
   //Try to find key for column with $field_body_name
-  $field_key = NULL;
   if (!empty($csv[0])) {
     $field_title_key = array_search($title_field, $csv[0]);
     $field_body_key = array_search($field_body_name, $csv[0]);
     $field_image_alt_key = array_search($field_image_alt_name, $csv[0]);
+
+    if (!empty($space_fields)) {
+      foreach ($space_fields as $space_field) {
+        if (array_search($space_field, $csv[0])) {
+          $space_field_keys[$space_field] = array_search($space_field, $csv[0]);
+        }
+      }
+    }
   }
   else {
     print '<h2 style="color: red">Empty headers</h2>';
@@ -63,18 +73,36 @@ if (($handle = fopen($path_to_file, 'r')) !== FALSE) {
 
   //Fill alt for image from title
   if (!empty($field_title_key) && !empty($field_image_alt_key)) {
+    print '<h2 style="color: green">Fill alt for image from title</h2>';
+    print '<table border="1"><tr><th>Value</th></tr>';
     foreach ($csv as $key => &$c) {
       if ($key == 0) {//don't change header
         continue;
       }
       if (empty($c[$field_image_alt_key]) && !empty($c[$field_body_key])) {
         $c[$field_image_alt_key] = $c[$field_title_key];
+        print '<tr><td>' . $c[$field_title_key] . '</td></tr>';
       }
     }
-
-
+    print '</table>';
   }
+
+  if (!empty($space_field_keys)) {
+    foreach ($space_field_keys as $space_field => $space_field_key) {
+      print '<h2 style="color: green">Add spaces for column '.$space_field.'</h2>';
+      foreach ($csv as $key => &$c) {
+        if ($key == 0) {//don't change header
+          continue;
+        }
+        if (empty($c[$space_field_key])) {
+          $c[$space_field_key] = ' ';
+        }
+      }
+    }
+  }
+
   fclose($handle);
+
   if (!empty($csv)) {
     $handle_new = fopen(str_replace('.csv', '_NEW.csv', $path_to_file), 'w');
     foreach ($csv as $c) {
