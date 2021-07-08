@@ -13,18 +13,18 @@ if (!empty($files)) {
     print '************************************************************************************************';
     print '<h1 style="color: green">' . $file_name . '</h1>';
     $path_to_file = $directory . '/' . $file_name;
-    $field_body_name = 'body_value';
-    $field_body_name_2 = 'field_cooking_text';
+    $field_body_name = 'body_value_en';
+    $field_body_name_2 = 'field_cooking_text_en';
 
-    $title_field = 'title_field';
-    $field_image_alt_name = 'field_image_alt';
+    $title_field = 'title_field_en';
+    $field_image_alt_name = 'field_image_alt_en';
 
     $new_path = '/sites/default/files/migration_images/';
 
-    $space_fields = ['field_article_subtitle', 'field_brand_subtitle_value'];
+    $space_fields = ['field_article_subtitle_en', 'field_brand_subtitle_value_en'];
 
-    $image_field = 'field_image';
-    $product_images_field = 'field_images';
+    $image_field = 'field_image_en';
+    $product_images_field = 'field_images_en';
 
     $field_title_key = NULL;
     $field_body_key = NULL;
@@ -145,7 +145,7 @@ if (!empty($files)) {
           if ($key == 0) {//don't change header
             continue;
           }
-          if (empty($c[$field_image_alt_key]) && !empty($c[$field_body_key])) {
+          if (empty($c[$field_image_alt_key]) && !empty($c[$field_title_key])) {
             $c[$field_image_alt_key] = $c[$field_title_key];
             print '<tr><td>' . $c[$field_title_key] . '</td></tr>';
           }
@@ -203,8 +203,8 @@ if (!empty($files)) {
 
       if (!empty($csv)) {
         $handle_new = fopen(str_replace('.csv', '_NEW.csv', $path_to_file), 'w');
-        foreach ($csv as $c) {
-          fputcsv($handle_new, $c, ';');
+        foreach ($csv as $new_c) {
+          fputcsv($handle_new, $new_c, ';');
         }
         fclose($handle_new);
       }
