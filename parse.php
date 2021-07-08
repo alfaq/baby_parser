@@ -14,6 +14,7 @@ if (!empty($files)) {
     print '<h1 style="color: green">' . $file_name . '</h1>';
     $path_to_file = $directory . '/' . $file_name;
     $field_body_name = 'body_value';
+    $field_body_name_2 = 'field_cooking_text';
 
     $title_field = 'title_field';
     $field_image_alt_name = 'field_image_alt';
@@ -46,6 +47,7 @@ if (!empty($files)) {
       if (!empty($csv[0])) {
         $field_title_key = array_search($title_field, $csv[0]);
         $field_body_key = array_search($field_body_name, $csv[0]);
+        $field_body_key_2 = array_search($field_body_name_2, $csv[0]);
         $field_image_alt_key = array_search($field_image_alt_name, $csv[0]);
         $product_images_field_key =  array_search($product_images_field, $csv[0]);
         $image_field_key =  array_search($image_field, $csv[0]);
@@ -78,7 +80,6 @@ if (!empty($files)) {
       }
 
       //Get all values from column $field_body_name
-      $field_values = [];
       if (!empty($field_body_key)) {
         $re = '!(https?:)?//\S+\.(?:jpe?g|jpg|png|gif)!Ui';
         print '<h2 style="color: green">Count rows ' . count($csv) . '</h2>';
@@ -105,6 +106,35 @@ if (!empty($files)) {
       }
       else {
         print '<h2 style="color: red">Can\'t find key for your field:' . $field_body_name . '</h2>';
+      }
+
+      //Get all values from column $field_body_name_2
+      if (!empty($field_body_key_2)) {
+        $re = '!(https?:)?//\S+\.(?:jpe?g|jpg|png|gif)!Ui';
+        print '<h2 style="color: green">Count rows ' . count($csv) . '</h2>';
+        print '<table border="1"><tr><th>Old path</th><th>New Path</th></tr>';
+        foreach ($csv as $key => &$c) {
+          if ($key == 0) {//don't get header
+            continue;
+          }
+          if (!empty($c[$field_body_key_2])) {
+            $value = $c[$field_body_key_2];
+            preg_match_all($re, $value, $matches);
+            if (!empty($matches[0])) {
+              foreach ($matches[0] as $match) {
+                $arr_srt = explode('/', $match);
+                $new_str = '/sites/default/files/migration_images/' . $arr_srt[count($arr_srt) - 1];
+                $value = str_replace($match, $new_str, $value);
+                $c[$field_body_key_2] = $value;
+                print '<tr><td>' . $match . '</td><td>' . $new_str . '</td></tr>';
+              }
+            }
+          }
+        }
+        print '</table>';
+      }
+      else {
+        print '<h2 style="color: red">Can\'t find key for your field 2:' . $field_body_name_2 . '</h2>';
       }
 
       //Fill alt for image from title
@@ -174,7 +204,7 @@ if (!empty($files)) {
       if (!empty($csv)) {
         $handle_new = fopen(str_replace('.csv', '_NEW.csv', $path_to_file), 'w');
         foreach ($csv as $c) {
-          fputcsv($handle_new, $c, ';', '~');
+          fputcsv($handle_new, $c, ';');
         }
         fclose($handle_new);
       }
